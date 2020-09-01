@@ -2,6 +2,7 @@ package com.rahadyan.lelanguser.controller;
 
 import com.rahadyan.lelanguser.dto.AddUserRequest;
 import com.rahadyan.lelanguser.dto.ResponseWrapper;
+import com.rahadyan.lelanguser.dto.TopupRequest;
 import com.rahadyan.lelanguser.model.User;
 import com.rahadyan.lelanguser.service.UserService;
 import org.slf4j.Logger;
@@ -20,8 +21,12 @@ public class UserController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String READ_BY_EMAIL_SUCCESS = "User Shown Success!";
     private static final String READ_BY_EMAIL_FAILED = "User Not Found!";
-    private static final String ADD_USER_SUCCESS = "User created Success!";
-    private static final String ADD_USER_FAILED = "User created Failed!";
+    private static final String ADD_USER_SUCCESS = "User Created Success!";
+    private static final String ADD_USER_FAILED = "User Created Failed!";
+    private static final String TOPUP_AMOUNT_SUCCESS = "Topup Amount Success!";
+    private static final String TOPUP_AMOUNT_FAILED = "Topup Amount Failed!";
+    private static final String DELETE_USER_SUCCESS = "Delete User Success!";
+    private static final String DELETE_USER_FAILED = "Delete User Failed!";
 
     @Autowired
     UserService userService;
@@ -54,7 +59,39 @@ public class UserController {
             responseMessage = new ResponseWrapper(ADD_USER_SUCCESS, user, 200, errors);
         } catch (Exception e) {
             errors.add(e.getMessage());
-            responseMessage = new ResponseWrapper(ADD_USER_FAILED, null, 500, errors);
+            responseMessage = new ResponseWrapper(ADD_USER_FAILED, user, 500, errors);
+            logger.error(e.getMessage());
+        }
+        return ResponseEntity.ok(responseMessage);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/topup")
+    public ResponseEntity<ResponseWrapper> topup(@RequestBody TopupRequest topupRequest, Errors err) {
+        ResponseWrapper responseMessage = null;
+        List<String> errors = new ArrayList<>();
+        User user = null;
+        try {
+            user = this.userService.topup(topupRequest);
+            responseMessage = new ResponseWrapper(TOPUP_AMOUNT_SUCCESS, user, 200, errors);
+        } catch (Exception e) {
+            errors.add(e.getMessage());
+            responseMessage = new ResponseWrapper(TOPUP_AMOUNT_FAILED, user, 500, errors);
+            logger.error(e.getMessage());
+        }
+        return ResponseEntity.ok(responseMessage);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseWrapper> delete(@RequestParam("email") String email) {
+        List<String> errors = new ArrayList<>();
+        ResponseWrapper responseMessage = null;
+        try {
+            userService.delete(email);
+            responseMessage =  new ResponseWrapper(DELETE_USER_SUCCESS, null, 200, errors);
+        } catch (Exception e) {
+            errors.add(e.getMessage());
+            responseMessage = new ResponseWrapper(DELETE_USER_FAILED, null, 500, errors);
             logger.error(e.getMessage());
         }
         return ResponseEntity.ok(responseMessage);
