@@ -22,6 +22,8 @@ public class UserController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String READ_BY_EMAIL_SUCCESS = "User Shown Success!";
     private static final String READ_BY_EMAIL_FAILED = "User Not Found!";
+    private static final String BROWSE_USER_SUCCESS = "Browse User Success!";
+    private static final String BROWSE_USER_FAILED = "Browse User Failed!";
     private static final String ADD_USER_SUCCESS = "User Created Success!";
     private static final String ADD_USER_FAILED = "User Created Failed!";
     private static final String TOPUP_AMOUNT_SUCCESS = "Topup Amount Success!";
@@ -33,6 +35,22 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/browse-user")
+    public ResponseEntity<ResponseWrapper> browse() {
+        ResponseWrapper responseMessage = null;
+        List<String> errors = new ArrayList<>();
+        try{
+            List<User> users = userService.findAll();
+            responseMessage = new ResponseWrapper(BROWSE_USER_SUCCESS, users, 200, errors);
+        } catch (Exception e) {
+            errors.add(e.getMessage());
+            responseMessage = new ResponseWrapper(BROWSE_USER_FAILED, null, 404, errors);
+            logger.error(e.getMessage());
+        }
+        return ResponseEntity.ok(responseMessage);
+    }
 
     @CrossOrigin(origins = "*")
     @GetMapping("/read-by-email")

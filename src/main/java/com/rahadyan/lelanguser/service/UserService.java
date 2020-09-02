@@ -11,12 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
     @Autowired
     UserRepository userRepository;
+
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        this.userRepository.findAll().forEach(auctionItem -> users.add(auctionItem));
+        return users;
+    }
 
     public User findByEmail(String email) throws Exception {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new Exception("User not found"));
@@ -40,6 +50,8 @@ public class UserService {
     public User topup(TopupRequest topupRequest){
         Optional<User> user = userRepository.findByEmail(topupRequest.getEmail());
         user.get().getWallet().setAmount(topupRequest.getAmount() + user.get().getWallet().getAmount());
+        userRepository.insertWalletHistory(UUID.randomUUID().toString(), topupRequest.getAmount(), "TopUp-" + user.get().getId(), "TOPUP",
+                LocalDateTime.now(), user.get().getId(),user.get().getWallet().getId());
         return userRepository.save(user.get());
     }
 
