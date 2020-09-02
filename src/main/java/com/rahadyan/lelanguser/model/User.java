@@ -1,5 +1,6 @@
 package com.rahadyan.lelanguser.model;
 
+import com.rahadyan.lelanguser.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,6 +42,10 @@ public class User {
 
     @Column
     private String address;
+
+    @Column(length = 20)
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     public User(String id, String fullname, String email, String address) {
         this.id = id;

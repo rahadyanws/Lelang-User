@@ -2,6 +2,8 @@ package com.rahadyan.lelanguser.service;
 
 import com.rahadyan.lelanguser.dto.AddUserRequest;
 import com.rahadyan.lelanguser.dto.TopupRequest;
+import com.rahadyan.lelanguser.dto.UpdateRoleRequest;
+import com.rahadyan.lelanguser.enums.UserRole;
 import com.rahadyan.lelanguser.model.User;
 import com.rahadyan.lelanguser.model.Wallet;
 import com.rahadyan.lelanguser.repository.UserRepository;
@@ -28,6 +30,7 @@ public class UserService {
                 .ktpNumber(addUserRequest.ktpNumber)
                 .phoneNumber(addUserRequest.phoneNumber)
                 .address(addUserRequest.address)
+                .role(UserRole.ROLE_BIDDER)
                 .wallet(new Wallet(null, 0))
                 .build();
         return userRepository.save(user);
@@ -44,6 +47,13 @@ public class UserService {
     public void delete(String email){
         Optional<User> user = userRepository.findByEmail(email);
         userRepository.delete(user.get());
+    }
+
+    @Transactional
+    public User updateRole(UpdateRoleRequest updateRoleRequest){
+        Optional<User> user = userRepository.findByEmail(updateRoleRequest.getEmail());
+        user.get().setRole(updateRoleRequest.getRole());
+        return userRepository.save(user.get());
     }
 
 }

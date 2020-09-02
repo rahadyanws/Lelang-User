@@ -3,6 +3,7 @@ package com.rahadyan.lelanguser.controller;
 import com.rahadyan.lelanguser.dto.AddUserRequest;
 import com.rahadyan.lelanguser.dto.ResponseWrapper;
 import com.rahadyan.lelanguser.dto.TopupRequest;
+import com.rahadyan.lelanguser.dto.UpdateRoleRequest;
 import com.rahadyan.lelanguser.model.User;
 import com.rahadyan.lelanguser.service.UserService;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ public class UserController {
     private static final String TOPUP_AMOUNT_FAILED = "Topup Amount Failed!";
     private static final String DELETE_USER_SUCCESS = "Delete User Success!";
     private static final String DELETE_USER_FAILED = "Delete User Failed!";
+    private static final String UPDATE_USER_ROLE_SUCCESS = "Update User Role Success!";
+    private static final String UPDATE_USER_ROLE_FAILED = "Update User Role Failed!";
 
     @Autowired
     UserService userService;
@@ -92,6 +95,23 @@ public class UserController {
         } catch (Exception e) {
             errors.add(e.getMessage());
             responseMessage = new ResponseWrapper(DELETE_USER_FAILED, null, 500, errors);
+            logger.error(e.getMessage());
+        }
+        return ResponseEntity.ok(responseMessage);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/update-role")
+    public ResponseEntity<ResponseWrapper> updateRole(@RequestBody UpdateRoleRequest updateRoleRequest, Errors err) {
+        ResponseWrapper responseMessage = null;
+        List<String> errors = new ArrayList<>();
+        User user = null;
+        try {
+            user = this.userService.updateRole(updateRoleRequest);
+            responseMessage = new ResponseWrapper(UPDATE_USER_ROLE_SUCCESS, user, 200, errors);
+        } catch (Exception e) {
+            errors.add(e.getMessage());
+            responseMessage = new ResponseWrapper(UPDATE_USER_ROLE_FAILED, user, 500, errors);
             logger.error(e.getMessage());
         }
         return ResponseEntity.ok(responseMessage);
